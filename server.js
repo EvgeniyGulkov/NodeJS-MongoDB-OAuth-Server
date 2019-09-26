@@ -3,9 +3,12 @@ const config = require('./config');
 const db = require("./app/libs/mongoose");
 const app = express();
 const bodyParser = require('body-parser');
-require('./app/routes/car_routes')(app,db);
 
 app.use(bodyParser.urlencoded({ extended: true }));
+
+require('./app/routes/order_routes')(app);
+require('./app/routes/company_routes')(app);
+require('./app/routes/user_routes')(app);
 
 app.listen(config,function () {
     console.log("listen on port " + config.port)
