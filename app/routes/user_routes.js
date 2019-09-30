@@ -1,35 +1,31 @@
 module.exports = function (app) {
 
-    const UserModel = require('../libs/mongoose').UserModel;
-    const routerSaver = require('./route_saver');
+    const oauth2 = require('../authorisation/oauth2');
+    const passport = require('passport');
+    var UserModel = require('../libs/mongoose').UserModel;
+    var ClientModel = require('../libs/mongoose').ClientModel;
+    require('../authorisation/oauth');
 
-    app.post('/users/', function(req, res) {
-        console.log(req.body);
-        const user = new UserModel({
-            firstName: req.body.firstName,
-            secondName: req.body.secondName,
-            userLogin: req.body.userLogin,
-            password: req.body.password,
-            companyID: req.body.companyID,
-            accessLevel: req.body.accessLevel
+    app.post('/oauth/token', oauth2.token);
+
+    app.get('/api/userinfo', passport.authenticate('bearer', { session: false }),
+        function(req, res) {
+            res.json({ user_id: req.user.userId, name: req.user.username, scope: req.authInfo.scope })
         });
-        user.save(routerSaver(user,res))
+
+    app.post('/createclient/', function(req, res) {
+        const client = new ClientModel({ username: "OurService iOS client v1", clientId: "mobileV1", clientSecret:"abc123456" });
+        client.save(function(err, client) {
+            if(err) return console.log(err);
+            else console.log("New client - " + client.clientId + "," + client.clientSecret);
+        });
     });
 
-    app.get('/users/:companyId', (req, res) => {
-        return UserModel.find({companyID: req.params.companyid}, function (err,user) {
-            if (!user) {
-                res.statusCode = 404;
-                return res.send({error: 'Not found'});
-            }
-            if (!err) {
-                console.log("Car request ok");
-                return res.send({status: 'OK', car: user});
-            } else {
-                res.statusCode = 500;
-                console.log('Internal error: ' +  res.statusCode, err.message);
-                return res.send({error: 'Server error'});
-            }
+    app.post('/createuser/', function(req, res) {
+        var user = new UserModel({username: "andrey", password: "simplepassword", companyID: "5d8c57585ed5df1cc49add65" });
+        user.save(function (err, user) {
+            if (err) return console.log(err);
+            else console.log("New user - " + user.username + ", " + user.password);
         });
     });
 };

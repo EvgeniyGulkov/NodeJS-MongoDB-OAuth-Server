@@ -1,7 +1,7 @@
 module.exports = function (model,res) {
     const err= model.err;
         if (!err) {
-            console.log("object added or updated");
+            console.log("Object added or updated");
             return res.send({ status: 'OK', model:model });
         } else {
             console.log(err);

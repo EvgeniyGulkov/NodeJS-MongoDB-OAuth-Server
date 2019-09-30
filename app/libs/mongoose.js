@@ -1,6 +1,7 @@
  const mongoose = require('mongoose');
  const ObjectId = mongoose.Schema.Types.ObjectId;
  const config = require('./config');
+ const crypto = require('crypto');
 
     mongoose.connect(config.get('mongoose:uri'), {useNewUrlParser: true});
 
@@ -14,34 +15,100 @@
 
     const Scheme = mongoose.Schema;
 
+    ////////////////// Company scheme ////////////
+
     const Company = new Scheme({
         companyName: {type: String, required: true}
     });
 
+ //////////////// carOrder scheme /////////////////////////////////
+
+ const CarOrder = new Scheme({
+     companyID: {type: ObjectId,required: true},
+     manufacturer: {type: String, required: true},
+     model: {type: String, required: true},
+     plate: {type: String, required: true},
+     date: {type: Date, default: Date.now()},
+     reason: {type: String, required: true},
+     status: {type: String, required: true},
+     orderNum: {type: Number, required:true}
+ });
+
+    ///////////////// User scheme /////////////////
+
     const User = new Scheme({
-        firstName: {type: String, required: true},
-        secondName: {type: String, required: true},
-        userLogin: {type: String, required: true},
-        password: {type: String, required: true},
+   //     firstName: {type: String, required: true},
+    //    secondName: {type: String, required: true},
+        username: {type: String, unique: true, required: true},
+        hashedPassword: {type: String, required: true},
+        salt: {type:String, required: true},
         companyID: {type: ObjectId, required: true},
-        accessLevel:{type: String, required: true}
+        created:{type: Date, default: Date.now()}
     });
 
-    const Car = new Scheme({
-            companyID: {type: ObjectId,required: true},
-            manufacturer: {type: String, required: true},
-            model: {type: String, required: true},
-            plate: {type: String, required: true},
-            date: {type: Date, default: Date.now()},
-            reason: {type: String, required: true},
-            status: {type: String, required: true},
-            orderNum: {type: Number, required:true}
-    });
+ User.methods.encryptPassword = function (password){
+     return crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
+ };
 
- Car.set('versionKey', false);
+ User.virtual('userId').get(function () {
+     return this.id
+ });
+
+ User.virtual('password').set(function (password) {
+     this._plainPassword = password;
+     this.salt = crypto.randomBytes(128).toString('hex');
+     this.hashedPassword = this.encryptPassword(password);
+ })
+     .get(function () {
+         return this._plainPassword;
+     });
+ User.methods.checkPassword = function(password) {
+    return this.encryptPassword(password) === this.hashedPassword;
+ };
+
+ ////////////////////////// Client scheme ////////////////////////
+ const Client = Scheme({
+     username: {type: String, unique: true, required: true},
+     clientId: {type: String, unique: true, required: true},
+     clientSecret: {type: String, required: true}
+ });
+
+ ///////////////////////// Access token scheme ////////////////////
+ const AccessToken = Scheme({
+     userId: {type: String, required: true},
+     clientId: {type:String, required: true},
+     token: {type:String, unique: true, required: true},
+     created: {type:Date, default:Date.now()}
+ });
+
+ /////////////////////////// Refresh token scheme /////////////////////
+ const RefreshToken = Scheme({
+     userId: {type: String, required: true},
+     clientId: {type:String, required: true},
+     token: {type:String, unique: true, required: true},
+     created: {type:Date, default:Date.now()}
+ });
+
+/////////////////////////// Other settings /////////////////////
+
+ CarOrder.set('versionKey', false);
  Company.set('versionKey', false);
  User.set('versionKey', false);
+ Client.set('versionKey', false);
+ AccessToken.set('versionKey', false);
+ RefreshToken.set('versionKey', false);
 
-    module.exports.CompanyModel = mongoose.model('Company',Company);
-    module.exports.CarModel = mongoose.model('Car', Car);
-    module.exports.UserModel = mongoose.model('User', User);
+ AccessTokenModel = mongoose.model('AccessToken', AccessToken);
+ RefreshTokenModel = mongoose.model('RefreshToken', RefreshToken);
+ UserModel = mongoose.model('User',User);
+ CarOrderModel = mongoose.model('CarOrder',CarOrder);
+ CompanyModel = mongoose.model('Company',Company);
+ ClientModel = mongoose.model('Client', Client);
+
+    module.exports.CompanyModel = CompanyModel;
+    module.exports.CarOrderModel = CarOrderModel;
+    module.exports.UserModel = UserModel;
+    module.exports.ClientModel = ClientModel;
+    module.exports.AccessTokenModel = AccessTokenModel;
+    module.exports.RefreshTokenModel = RefreshTokenModel;
+    module.exports.mongoose = mongoose;

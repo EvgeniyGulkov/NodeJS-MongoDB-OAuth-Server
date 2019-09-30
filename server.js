@@ -3,8 +3,11 @@ const config = require('./config');
 const db = require("./app/libs/mongoose");
 const app = express();
 const bodyParser = require('body-parser');
+const passport = require('passport');
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(passport.initialize());
 
 require('./app/routes/order_routes')(app);
 require('./app/routes/company_routes')(app);
