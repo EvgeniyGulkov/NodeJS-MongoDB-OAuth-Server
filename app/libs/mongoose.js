@@ -37,9 +37,9 @@
     ///////////////// User scheme /////////////////
 
     const User = new Scheme({
-   //     firstName: {type: String, required: true},
-    //    secondName: {type: String, required: true},
-        username: {type: String, unique: true, required: true},
+        firstName: {type: String, required: false},
+        lastName: {type: String, required: false},
+        username: { type: String, require: true, index:true, unique:true,sparse:true},
         hashedPassword: {type: String, required: true},
         salt: {type:String, required: true},
         companyID: {type: ObjectId, required: true},
@@ -73,6 +73,10 @@
      clientSecret: {type: String, required: true}
  });
 
+ const Admin = Scheme({
+     userId: {type: ObjectId, required: true}
+ });
+
  ///////////////////////// Access token scheme ////////////////////
  const AccessToken = Scheme({
      userId: {type: String, required: true},
@@ -97,6 +101,7 @@
  Client.set('versionKey', false);
  AccessToken.set('versionKey', false);
  RefreshToken.set('versionKey', false);
+ Admin.set('versionKey', false);
 
  AccessTokenModel = mongoose.model('AccessToken', AccessToken);
  RefreshTokenModel = mongoose.model('RefreshToken', RefreshToken);
@@ -104,11 +109,13 @@
  CarOrderModel = mongoose.model('CarOrder',CarOrder);
  CompanyModel = mongoose.model('Company',Company);
  ClientModel = mongoose.model('Client', Client);
+ AdminModel = mongoose.model('Admin', Admin);
 
-    module.exports.CompanyModel = CompanyModel;
+ module.exports.CompanyModel = CompanyModel;
     module.exports.CarOrderModel = CarOrderModel;
     module.exports.UserModel = UserModel;
     module.exports.ClientModel = ClientModel;
     module.exports.AccessTokenModel = AccessTokenModel;
     module.exports.RefreshTokenModel = RefreshTokenModel;
+    module.exports.AdminModel = AdminModel;
     module.exports.mongoose = mongoose;
