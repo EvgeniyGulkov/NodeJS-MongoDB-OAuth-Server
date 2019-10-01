@@ -18,7 +18,7 @@
     ////////////////// Company scheme ////////////
 
     const Company = new Scheme({
-        companyName: {type: String, required: true}
+        companyName: {type: String, required: true,unique: true}
     });
 
  //////////////// carOrder scheme /////////////////////////////////
@@ -39,7 +39,7 @@
     const User = new Scheme({
         firstName: {type: String, required: false},
         lastName: {type: String, required: false},
-        username: { type: String, require: true, index:true, unique:true,sparse:true},
+        username: { type: String, require: true},
         hashedPassword: {type: String, required: true},
         salt: {type:String, required: true},
         companyID: {type: ObjectId, required: true},
@@ -68,7 +68,7 @@
 
  ////////////////////////// Client scheme ////////////////////////
  const Client = Scheme({
-     username: {type: String, unique: true, required: true},
+     name: {type: String, unique: true, required: true},
      clientId: {type: String, unique: true, required: true},
      clientSecret: {type: String, required: true}
  });

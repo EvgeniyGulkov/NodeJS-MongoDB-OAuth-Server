@@ -2,8 +2,8 @@ module.exports = function (app) {
 
     const oauth2 = require('../authorisation/oauth2');
     const passport = require('passport');
-    var AdminModel = require('../libs/mongoose').AdminModel;
-    var UserModel = require('../libs/mongoose').UserModel;
+    const AdminModel = require('../libs/mongoose').AdminModel;
+    const UserModel = require('../libs/mongoose').UserModel;
     const config = require('../libs/config');
 
     require('../authorisation/oauth');
