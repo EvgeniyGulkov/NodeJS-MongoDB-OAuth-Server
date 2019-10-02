@@ -21,13 +21,13 @@ module.exports = function (app) {
                 const user = new UserModel({
                     username: req.body.username,
                     password: req.body.password,
-                    companyID: req.body.companyID
+                    companyName: req.body.companyName
                 });
                 user.save(function (err, user) {
                     if (err) return console.log(err);
                     else {
                         const admin = new AdminModel({
-                            userId: user._id,
+                            userName: user.userName,
                         });
                         admin.save(function (err, admin) {
                             if (err) return console.log(err);
@@ -46,7 +46,7 @@ module.exports = function (app) {
 
     app.post('/admin/adduser', passport.authenticate('bearer', {session: false}),
         function (req, res) {
-            return AdminModel.findOne({userId: req.user._id}, function (err, admin) {
+            return AdminModel.findOne({userName: req.user.username}, function (err, admin) {
                 if (!admin) {
                     return res.send({error: 'Access Denied'});
                 }
@@ -58,7 +58,7 @@ module.exports = function (app) {
                                 lastName: req.body.lastName,
                                 username: req.body.username,
                                 password: req.body.password,
-                                companyID: req.user.companyID
+                                companyName: req.user.companyName
                             });
                             user.save();
                             return res.send({status: 'User added'});

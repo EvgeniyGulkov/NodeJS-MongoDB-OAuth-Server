@@ -5,29 +5,37 @@
     const ClientModel = require('./app/libs/mongoose').ClientModel;
     const config = require('./app/libs/config');
 
-    const company = new CompanyModel({
-        _id: config.get('default:company:id'),
-        companyName: config.get('default:company:companyName') });
+    addCompany();
+    addUser();
+    addAdmin();
+    addClient();
 
-    company.save(function (err, company) {
-        if (!err) {
-        } else {
-            if (err.name === 'ValidationError') {
-                console.log("company validation " + err.message)
+    function addCompany() {
+        const company = new CompanyModel({
+            companyName: config.get('default:company:companyName')
+        });
+        company.save(function (err, company) {
+            if (!err) {
+                console.log("Company " + company.companyName + " created");
             } else {
-                console.log("internal error")
+                if (err.name === 'ValidationError') {
+                    console.log("company validation " + err.message)
+                } else {
+                    console.log("internal error")
+                }
             }
-        }
-    });
+        });
+    }
 
-        user = new UserModel({
+    function addUser() {
+       const user = new UserModel({
             username: config.get('default:user:username'),
             password: config.get('default:user:password'),
-            companyID: config.get('default:company:id')
+            companyName: config.get('default:company:companyName'),
         });
-        user.save(function async (err, client) {
+        user.save(function (err, user) {
             if (!err) {
-                return addAdmin(user._id)
+                console.log("New user -" + user.username + " created!")
             } else {
                 if (err.name === 'ValidationError') {
                     console.log("client validation " + err.message)
@@ -36,44 +44,43 @@
                 }
             }
         });
+    }
 
+    function addClient() {
         const client = new ClientModel({
             name: config.get('default:client:name'),
             clientId: config.get('default:client:clientId'),
             clientSecret: config.get('default:client:clientSecret')
         });
+        client.save(function (err, client) {
+            if (!err) {
+                console.log('New client - ' + client.name + ',' + client.clientSecret);
+            } else {
+                if (err.name === 'ValidationError') {
+                    console.log("client validation " + err.message)
+                } else {
+                    console.log("internal error")
+                }
+            }
+        });
+    }
 
-            client.save(function (err, client) {
-
+        function addAdmin() {
+            const admin = new AdminModel({
+                userName: config.get('default:user:username'),
+            });
+            admin.save(function (err, admin) {
                 if (!err) {
-                    console.log('New client - ' + client.name + ',' + client.clientSecret);
+                    console.log("New admin -" + admin.userName + " created!")
                 } else {
                     if (err.name === 'ValidationError') {
                         console.log("client validation " + err.message)
                     } else {
-                        console.log("internal error")
+                        console.log("error " + err.message)
                     }
                 }
-        });
-
-            function addAdmin(id) {
-                console.log(id);
-                const admin = new AdminModel({
-                    userId: id
-                });
-
-                admin.save(function (err, admin) {
-                    if (!err) {
-                        console.log('New admin ' + user._id);
-                    } else {
-                        if (err.name === 'ValidationError') {
-                            console.log("client validation " + err.message)
-                        } else {
-                            console.log("error " + err.message)
-                        }
-                    }
-                });
-            }
+            });
+        }
 
     setTimeout(function() {
         mongoose.disconnect();

@@ -24,7 +24,7 @@
  //////////////// carOrder scheme /////////////////////////////////
 
  const CarOrder = new Scheme({
-     companyID: {type: ObjectId,required: true},
+     companyName: {type: String,required: true},
      manufacturer: {type: String, required: true},
      model: {type: String, required: true},
      plate: {type: String, required: true},
@@ -39,10 +39,10 @@
     const User = new Scheme({
         firstName: {type: String, required: false},
         lastName: {type: String, required: false},
-        username: { type: String, require: true},
+        username: { type: String, require: true,unique: true},
         hashedPassword: {type: String, required: true},
         salt: {type:String, required: true},
-        companyID: {type: ObjectId, required: true},
+        companyName: {type: String, required: true},
         created:{type: Date, default: Date.now()}
     });
 
@@ -74,7 +74,7 @@
  });
 
  const Admin = Scheme({
-     userId: {type: ObjectId, required: true}
+     userName: {type: String, required: true,unique: true}
  });
 
  ///////////////////////// Access token scheme ////////////////////
