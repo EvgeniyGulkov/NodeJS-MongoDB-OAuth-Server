@@ -7,7 +7,7 @@ module.exports = function (app) {
 
     app.get('/api/carorders/', passport.authenticate('bearer', { session: false }),
         function(req, res) {
-            return CarOrderModel.find({companyID: req.user.companyID}, function (err, carOrder) {
+            return CarOrderModel.find({companyName: req.user.companyName}, function (err, carOrder) {
                 if (!carOrder) {
                     res.statusCode = 404;
                     return res.send({error: 'Not found'});
@@ -27,12 +27,12 @@ module.exports = function (app) {
         function(req, res) {
         return CarOrderModel.findOne({
             orderNum: req.body.orderNum,
-            companyID: req.user.companyID
+            companyName: req.user.companyName
         }, function (err, carOrder) {
             if (!carOrder) {
                 carOrder = CarOrderModel();
             }
-            carOrder.companyID = req.user.companyID;
+            carOrder.companyName = req.user.companyName;
             carOrder.manufacturer = req.body.manufacturer;
             carOrder.model = req.body.model;
             carOrder.plate = req.body.plate;
