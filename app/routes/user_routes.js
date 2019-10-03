@@ -17,65 +17,64 @@ module.exports = function (app) {
 
     app.post('/admin/addadmin', passport.authenticate('bearer', {session: false}),
         function (req, res) {
-            if (req.user.username === config.get('adminname')) {
+            addAdmin(req, res)
+        });
+    app.post('/admin/adduser', passport.authenticate('bearer', {session: false}), function (req, res) {
+        addUser(req, res)
+    });
+
+    function addUser(req, res) {
+        AdminModel.findOne({userName: req.user.username}, function (err, admin) {
+            if (admin) {
                 const user = new UserModel({
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
                     username: req.body.username,
                     password: req.body.password,
-                    companyName: req.body.companyName
+                    companyName: req.user.companyName
                 });
                 user.save(function (err, user) {
-                    if (err) return console.log(err);
-                    else {
-                        const admin = new AdminModel({
-                            userName: user.userName,
-                        });
-                        admin.save(function (err, admin) {
-                            if (err) return console.log(err);
-                            else {
-                                const str = "New admin added";
-                                res.json({str});
-                            }
-                        })
+                    if (!user) {
+                        return res.send(err.message)
+                    }
+                    if (!err) {
+                        console.log("new user " + user.username);
+                        return res.send("user created");
+                    } else {
+                        console.log(err.name);
+                        return res.send(err.name)
                     }
                 });
             } else {
-                const error = "Access denied";
-                res.json({error});
+                res.send({error: "Access denied"});
             }
         });
+    }
 
-    app.post('/admin/adduser', passport.authenticate('bearer', {session: false}),
-        function (req, res) {
-            return AdminModel.findOne({userName: req.user.username}, function (err, admin) {
-                if (!admin) {
-                    return res.send({error: 'Access Denied'});
-                }
-                if (!admin.err) {
-                    return UserModel.findOne({username: req.body.username}, function (err, user) {
-                        if (!user) {
-                            const user = new UserModel({
-                                firstName: req.body.firstName,
-                                lastName: req.body.lastName,
-                                username: req.body.username,
-                                password: req.body.password,
-                                companyName: req.user.companyName
-                            });
-                            user.save();
-                            return res.send({status: 'User added'});
-                        }
-                        if(!err) {
-                            return res.send({error: 'User exist'});
-                        }
-                      else {
-                            res.statusCode = 500;
-                            return res.send({error: 'Internal error'});
-                        }
-                    })
-                }
-                else {
-                    res.statusCode = 500;
-                    return res.send({error: 'Server error'});
-                }
-            });
-        });
+        function addAdmin(req, res) {
+            if (req.user.username === config.get('default:user:username')) {
+                UserModel.findOne({username: req.body.username}, function (err, user) {
+                    if (user) {
+                        console.log("Set " + user.username + " as admin");
+                        const admin = new AdminModel({
+                            userName: user.username
+                        });
+                        admin.save(function (err, admin) {
+                            if (!admin) {
+                                return res.send(err.message)
+                            }
+                            if (!err) {
+                                return res.send("new admin " + admin.userName)
+                            } else {
+                                return res.send(err.name)
+                            }
+                        })
+                    } else {
+                        res.send("User not found")
+                    }
+                });
+            } else {
+                res.send({error: "Access denied"});
+            }
+        }
 };
