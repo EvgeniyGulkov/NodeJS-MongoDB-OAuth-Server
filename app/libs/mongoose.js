@@ -28,7 +28,7 @@
      manufacturer: {type: String, required: true},
      model: {type: String, required: true},
      plate: {type: String, required: true},
-     date: {type: Date, default: Date.now()},
+     date: {type: Date, required:true, default: Date.now()},
      reason: {type: String, required: true},
      status: {type: String, required: true},
      orderNum: {type: Number, required:true}

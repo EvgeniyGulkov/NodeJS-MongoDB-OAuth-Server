@@ -14,7 +14,7 @@ module.exports = function (app) {
                 }
                 if (!err) {
                     console.log("Order request ok");
-                    return res.send({status: 'OK', carOrder: carOrder});
+                    return res.send({status: 'Order added to Database'});
                 } else {
                     res.statusCode = 500;
                     console.log('Internal error: ' +  res.statusCode, err.message);
@@ -36,7 +36,7 @@ module.exports = function (app) {
             carOrder.manufacturer = req.body.manufacturer;
             carOrder.model = req.body.model;
             carOrder.plate = req.body.plate;
-            carOrder.date = req.body.date;
+            carOrder.date = new Date;
             carOrder.reason = req.body.reason;
             carOrder.status = req.body.status;
             carOrder.orderNum = req.body.orderNum;

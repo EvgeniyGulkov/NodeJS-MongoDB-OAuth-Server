@@ -35,10 +35,12 @@ module.exports = function (app) {
                 });
                 user.save(function (err, user) {
                     if (!user) {
+                        res.statusCode = 404;
                         return res.send(err.message)
                     }
                     if (!err) {
                         console.log("new user " + user.username);
+                        res.statusCode = 500;
                         return res.send("user created");
                     } else {
                         console.log(err.name);

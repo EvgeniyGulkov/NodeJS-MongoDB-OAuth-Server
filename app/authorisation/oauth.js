@@ -60,13 +60,16 @@ passport.use(new BearerStrategy(
                 return done(null, false);
             }
 
-            if (Math.round((Date.now() - token.created) / 1000) > config.get('security:tokenLife')) {
+            const tokenTime = Math.round((Date.now() - token.created) / 1000);
+            console.log(tokenTime);
+            if (tokenTime > config.get('security:tokenLife')) {
                 AccessTokenModel.remove({token: accessToken}, function (err) {
                     if (err) {
                         console.log(err);
                         return done(err);
                     }
                 });
+                console.log('Token expired');
                 return done(null, false, {message: 'Token expired'});
             }
 

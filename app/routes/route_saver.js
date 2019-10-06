@@ -2,7 +2,7 @@ module.exports = function (model,res) {
     const err= model.err;
         if (!err) {
             console.log("Object added or updated");
-            return res.send({ status: 'OK', model:model });
+            return res.send({ status:"Object added to Database" });
         } else {
             console.log(err);
             if(err.name === 'ValidationError') {
