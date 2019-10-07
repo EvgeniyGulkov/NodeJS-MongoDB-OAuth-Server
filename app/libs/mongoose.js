@@ -81,6 +81,8 @@
      clientSecret: {type: String, required: true}
  });
 
+ ///////////////////////// Admin scheme //////////////////////////////
+
  const Admin = Scheme({
      userName: {type: String, required: true,unique: true}
  });
@@ -101,29 +103,22 @@
      created: {type:Date, default:Date.now()}
  });
 
-/////////////////////////// Other settings /////////////////////
+ const Recommendation = Scheme({
+     orderNum: {type: Number, required: true},
+     username: {type: String, required: true},
+     companyName: {type:String, required: true},
+     message: {type:String, required: true},
+     created: {type:Date, default:Date.now()}
+ });
 
- CarOrder.set('versionKey', false);
- Company.set('versionKey', false);
- User.set('versionKey', false);
- Client.set('versionKey', false);
- AccessToken.set('versionKey', false);
- RefreshToken.set('versionKey', false);
- Admin.set('versionKey', false);
+/////////////////////////// Exports /////////////////////
 
- AccessTokenModel = mongoose.model('AccessToken', AccessToken);
- RefreshTokenModel = mongoose.model('RefreshToken', RefreshToken);
- UserModel = mongoose.model('User',User);
- CarOrderModel = mongoose.model('CarOrder',CarOrder);
- CompanyModel = mongoose.model('Company',Company);
- ClientModel = mongoose.model('Client', Client);
- AdminModel = mongoose.model('Admin', Admin);
-
- module.exports.CompanyModel = CompanyModel;
-    module.exports.CarOrderModel = CarOrderModel;
-    module.exports.UserModel = UserModel;
-    module.exports.ClientModel = ClientModel;
-    module.exports.AccessTokenModel = AccessTokenModel;
-    module.exports.RefreshTokenModel = RefreshTokenModel;
-    module.exports.AdminModel = AdminModel;
+    module.exports.CompanyModel = mongoose.model('Company',Company);
+    module.exports.CarOrderModel = mongoose.model('CarOrder',CarOrder);
+    module.exports.UserModel =  mongoose.model('User',User);
+    module.exports.ClientModel = mongoose.model('Client', Client);
+    module.exports.AccessTokenModel = mongoose.model('AccessToken', AccessToken);
+    module.exports.RefreshTokenModel = mongoose.model('RefreshToken', RefreshToken);
+    module.exports.AdminModel = mongoose.model('Admin', Admin);
+    module.exports.RecommendationModel = mongoose.model('Recommendation', Recommendation);
     module.exports.mongoose = mongoose;

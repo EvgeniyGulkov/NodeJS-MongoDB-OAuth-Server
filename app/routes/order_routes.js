@@ -2,7 +2,6 @@ module.exports = function (app) {
 
     const CarOrderModel = require('../libs/mongoose').CarOrderModel;
     const routerSaver = require('./route_saver');
-    const oauth2 = require('../authorisation/oauth2');
     const passport = require('passport');
 
     app.get('/api/carorders/', passport.authenticate('bearer', { session: false }),
@@ -14,7 +13,7 @@ module.exports = function (app) {
                 }
                 if (!err) {
                     console.log("Order request ok");
-                    return res.send({status: 'Order added to Database'});
+                    return res.send({carorder: carOrder});
                 } else {
                     res.statusCode = 500;
                     console.log('Internal error: ' +  res.statusCode, err.message);
