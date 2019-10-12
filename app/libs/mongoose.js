@@ -29,7 +29,7 @@
      model: {type: String, required: true},
      plate: {type: String, required: true},
      date: {type: Date, required:true, default: Date.now()},
-     reason: {type: String, required: true},
+     vinNumber: {type: String, required: true},
      status: {type: String, required: true},
      orderNum: {type: Number, required:true}
  });
@@ -111,8 +111,16 @@
      created: {type:Date, default:Date.now()}
  });
 
+ const Reason = Scheme({
+     orderNum: {type: Number, required: true},
+     companyName: {type:String, required: true},
+     reasonStatus: {type:String, required: true},
+     reasonText: {type:String, required: true},
+ });
+
 /////////////////////////// Exports /////////////////////
 
+    module.exports.ReasonModel = mongoose.model('Reason',Reason);
     module.exports.CompanyModel = mongoose.model('Company',Company);
     module.exports.CarOrderModel = mongoose.model('CarOrder',CarOrder);
     module.exports.UserModel =  mongoose.model('User',User);

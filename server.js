@@ -12,6 +12,10 @@ app.use(passport.initialize());
 require('./app/routes/order_routes')(app);
 require('./app/routes/company_routes')(app);
 require('./app/routes/user_routes')(app);
+require('./app/routes/recommendation_routes')(app);
+require('./app/routes/reason_routes')(app);
+
+
 
 app.listen(config,function () {
     console.log("listen on port " + config.port)
