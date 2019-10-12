@@ -2,10 +2,9 @@ module.exports = function (app) {
 
     const CarOrderModel = require('../libs/mongoose').CarOrderModel;
     const ReasonModel = require('../libs/mongoose').ReasonModel;
-    const routerSaver = require('./route_saver');
     const passport = require('passport');
 
-    app.get('/api/carorders/', passport.authenticate('bearer', { session: false }),
+    app.get('/api/carorders/', passport.authenticate('bearer', { session: false },function () {}),
         function(req, res) {
             return CarOrderModel.find({companyName: req.user.companyName}, function (err, carOrder) {
                 if (!carOrder) {
@@ -23,7 +22,7 @@ module.exports = function (app) {
             });
         });
 
-    app.post('/api/carOrders/',passport.authenticate('bearer', { session: false }),
+    app.post('/api/carOrders/',passport.authenticate('bearer', { session: false },function () {}),
         function(req, res) {
         return CarOrderModel.findOne({
             orderNum: req.body.orderNum,
@@ -55,24 +54,18 @@ module.exports = function (app) {
         });
     });
 
-    function addReasons (req,res) {
+    function addReasons (req) {
         let reasonRow = (req.body.reason).split(",");
-        ReasonModel.deleteMany({ orderNum: req.body.orderNum, companyName: req.user.companyName }, function (err) {
+        ReasonModel.deleteMany({ orderNum: req.body.orderNum, companyName: req.user.companyName }, function () {
             reasonRow.forEach(function(entry) {
-                var reason = new ReasonModel;
+                let reason = new ReasonModel;
                 reason.orderNum = req.body.orderNum;
                 reason.companyName = req.user.companyName;
                 reason.reasonStatus = "notComplete";
                 reason.reasonText = entry;
-                reason.save(function (err, reason) {
-                    if (!reason) {
-               //         return res.send(err.message)
-                    }
+                reason.save(function (err) {
                     if (!err) {
                         console.log("New reason added or updated");
-              //          return res.send("new reason to order " + reason.orderNum)
-                    } else {
-             //           return res.send(err.name)
                     }
                 });
             });

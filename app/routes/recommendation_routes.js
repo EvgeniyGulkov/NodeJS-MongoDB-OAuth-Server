@@ -3,7 +3,7 @@ module.exports = function (app) {
     const RecommendationModel = require('../libs/mongoose').RecommendationModel;
     const passport = require('passport');
 
-    app.get('/api/recommendation/', passport.authenticate('bearer', { session: false }),
+    app.get('/api/recommendation/', passport.authenticate('bearer', { session: false },function () {}),
         function(req, res) {
             return RecommendationModel.find({companyName: req.user.companyName,orderNum: req.body.orderNum}, function (err, recommendation) {
                 if (!recommendation) {
@@ -21,7 +21,7 @@ module.exports = function (app) {
             });
         });
 
-    app.post('/api/recommendation/add',passport.authenticate('bearer', { session: false }),
+    app.post('/api/recommendation/add',passport.authenticate('bearer', { session: false },function () {}),
         function(req, res) {
                 const recommendation = new RecommendationModel ({
                 companyName: req.user.companyName,

@@ -2,9 +2,8 @@ module.exports = function (app) {
 
     const ReasonModel = require('../libs/mongoose').ReasonModel;
     const passport = require('passport');
-    const routerSaver = require('./route_saver');
 
-    app.get('/api/reasons/', passport.authenticate('bearer', {session: false}),
+    app.get('/api/reasons/', passport.authenticate('bearer', {session: false},function ({}) {}),
         function (req, res) {
             return ReasonModel.find({
                 companyName: req.user.companyName,
@@ -25,7 +24,9 @@ module.exports = function (app) {
             });
         });
 
-    app.post('/api/reasons/changestatus', passport.authenticate('bearer', {session: false}),
+    app.post('/api/reasons/changestatus', passport.authenticate('bearer', {session: false},function ({}) {
+        
+        }),
         function (req, res) {
             return ReasonModel.findOne({
                 _id: req.body.id,

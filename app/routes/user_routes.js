@@ -10,18 +10,18 @@ module.exports = function (app) {
 
     app.post('/oauth/token', oauth2.token);
 
-    app.get('/api/userinfo', passport.authenticate('bearer', {session: false}),
+    app.get('/api/userinfo', passport.authenticate('bearer', {session: false},function () {}),
         function (req, res) {
             res.json({user_id: req.user.userId, name: req.user.username, scope: req.authInfo.scope})
         });
 
-    app.post('/admin/addadmin', passport.authenticate('bearer', {session: false}),
+    app.post('/admin/addadmin', passport.authenticate('bearer', {session: false},function () {}),
         function (req, res) {
             addAdmin(req, res)
         });
-    app.post('/admin/adduser', passport.authenticate('bearer', {session: false}), function (req, res) {
+    app.post('/admin/adduser', passport.authenticate('bearer', {session: false}, function (req, res,) {
         addUser(req, res)
-    });
+    }));
 
     function addUser(req, res) {
         AdminModel.findOne({userName: req.user.username}, function (err, admin) {
