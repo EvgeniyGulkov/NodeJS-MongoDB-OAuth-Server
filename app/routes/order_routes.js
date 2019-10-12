@@ -58,12 +58,11 @@ module.exports = function (app) {
     function addReasons (req,res) {
         let reasonRow = (req.body.reason).split(",");
         ReasonModel.deleteMany({ orderNum: req.body.orderNum, companyName: req.user.companyName }, function (err) {
-            console.log(reasonRow);
             reasonRow.forEach(function(entry) {
                 var reason = new ReasonModel;
                 reason.orderNum = req.body.orderNum;
                 reason.companyName = req.user.companyName;
-                reason.reasonStatus = "inWork";
+                reason.reasonStatus = "notComplete";
                 reason.reasonText = entry;
                 reason.save(function (err, reason) {
                     if (!reason) {
