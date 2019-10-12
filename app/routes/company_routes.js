@@ -2,9 +2,8 @@ module.exports = function (app) {
 
     const CompanyModel = require('../libs/mongoose').CompanyModel;
     const passport = require('passport');
-    const config = require('../libs/config');
 
-    app.post('/api/companies/', passport.authenticate('bearer', {session: false},function (){}),
+    app.post('/api/companies/', passport.authenticate('bearer', {session: false}),
         function(req, res) {
             if (req.user.username === config.get('adminname')) {
                 const company = new CompanyModel({

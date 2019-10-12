@@ -3,7 +3,7 @@ module.exports = function (app) {
     const ReasonModel = require('../libs/mongoose').ReasonModel;
     const passport = require('passport');
 
-    app.get('/api/reasons/', passport.authenticate('bearer', {session: false},function ({}) {}),
+    app.get('/api/reasons/', passport.authenticate('bearer', {session: false}),
         function (req, res) {
             return ReasonModel.find({
                 companyName: req.user.companyName,
@@ -24,9 +24,7 @@ module.exports = function (app) {
             });
         });
 
-    app.post('/api/reasons/changestatus', passport.authenticate('bearer', {session: false},function ({}) {
-        
-        }),
+    app.post('/api/reasons/changestatus', passport.authenticate('bearer', {session: false}),
         function (req, res) {
             return ReasonModel.findOne({
                 _id: req.body.id,
