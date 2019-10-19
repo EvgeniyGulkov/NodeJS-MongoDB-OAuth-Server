@@ -39,7 +39,7 @@ module.exports = function (app) {
                         }
                         if (!err) {
                             console.log("Reason status changed");
-                            return res.send("reason status changed to " + reason.reasonStatus)
+                            return res.send({reason: reason})
                         } else {
                             return res.send(err.name)
                         }

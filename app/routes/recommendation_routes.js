@@ -27,14 +27,14 @@ module.exports = function (app) {
                 companyName: req.user.companyName,
                 created : new Date(),
                 orderNum : req.body.orderNum,
-                username : req.user.username
+                username : req.user.usernamenpm
                 });
             recommendation.save(function (err, recommendation) {
                 if (!recommendation) {
                     return res.send(err.message)
                 }
-                if (!recommendation) {
-                    return res.send("new recommendation added")
+                if (!err) {
+                    return res.send({recommendation: recommendation})
                 } else {
                     return res.send(err.name)
                 }
