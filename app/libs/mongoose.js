@@ -114,7 +114,7 @@
  const Reason = Scheme({
      orderNum: {type: Number, required: true},
      companyName: {type:String, required: true},
-     reasonStatus: {type:String, required: true},
+     reasonStatus: {type:Boolean, required: true},
      reasonText: {type:String, required: true},
  });
 

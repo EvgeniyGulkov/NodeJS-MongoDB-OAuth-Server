@@ -6,14 +6,15 @@ module.exports = function (app) {
 
     app.get('/api/carorders/', passport.authenticate('bearer', {session: false}),
         function (req, res) {
-            return CarOrderModel.find({companyName: req.user.companyName}, function (err, carOrder) {
+            return CarOrderModel.find({companyName: req.user.companyName},{_id:0, companyName:0, reason: 0, __v:0}, function (err, carOrder) {
                 if (!carOrder) {
                     res.statusCode = 404;
                     return res.send({error: 'Not found'});
                 }
                 if (!err) {
                     console.log("Order request ok");
-                    return res.send({carorder: carOrder});
+                    console.log(carOrder);
+                    return res.json(carOrder);
                 } else {
                     res.statusCode = 500;
                     console.log('Internal error: ' + res.statusCode, err.message);
@@ -45,6 +46,7 @@ module.exports = function (app) {
                     }
                     if (!err) {
                         console.log("New order added or updated");
+                        return res.send({result: "order added"})
                     } else {
                         return res.send(err.name)
                     }
@@ -65,7 +67,7 @@ module.exports = function (app) {
                 if (!reason) {
                     reason = new ReasonModel;
                     reason.orderNum = req.body.orderNum;
-                    reason.reasonStatus = "notComplete";
+                    reason.reasonStatus = false;
                     reason.companyName = req.user.companyName;
                     reason.reasonText = entry;
                     reason.save(function (err, reason) {
@@ -74,7 +76,7 @@ module.exports = function (app) {
                         }
                         if (!err) {
                             console.log("New order added or updated");
-                            return res.send("new reason " + entry)
+                            //return res.send("new reason added")
                         } else {
                             return res.send(err.name)
                         }

@@ -3,19 +3,24 @@ module.exports = function (app) {
     const ReasonModel = require('../libs/mongoose').ReasonModel;
     const passport = require('passport');
 
-    app.get('/api/reasons/', passport.authenticate('bearer', {session: false}),
+    app.get('/api/reasons/:num', passport.authenticate('bearer', {session: false}),
         function (req, res) {
+        console.log(req.params.num);
+        var orderNum = req.params.num;
             return ReasonModel.find({
                 companyName: req.user.companyName,
-                orderNum: req.body.orderNum
-            }, function (err, reason) {
+                orderNum: orderNum
+            },{companyName:0, __v:0}, function (err, reason) {
                 if (!reason) {
+                    console.log(err);
                     res.statusCode = 404;
                     return res.send({error: 'Not found'});
                 }
                 if (!err) {
                     console.log("Reasons send");
-                    return res.send({reason: reason});
+                    res.statusCode = 200;
+                    console.log(JSON.stringify(reason));
+                    return res.send(JSON.stringify(reason));
                 } else {
                     res.statusCode = 500;
                     console.log('Internal error: ' + res.statusCode, err.message);
@@ -26,8 +31,9 @@ module.exports = function (app) {
 
     app.post('/api/reasons/changestatus', passport.authenticate('bearer', {session: false}),
         function (req, res) {
+        console.log(req.body.id);
             return ReasonModel.findOne({
-                _id: req.body.id,
+                _id: req.body.id
             }, function (err, reason) {
                 if (!reason) {
                     res.send("Not found")
@@ -39,8 +45,10 @@ module.exports = function (app) {
                         }
                         if (!err) {
                             console.log("Reason status changed");
+                            res.statusCode = 200;
                             return res.send({reason: reason})
                         } else {
+                            console.log(err.name);
                             return res.send(err.name)
                         }
                     });

@@ -25,17 +25,21 @@ module.exports = function (app) {
         function(req, res) {
                 const recommendation = new RecommendationModel ({
                 companyName: req.user.companyName,
-                created : new Date(),
+                created : req.body.date,
                 orderNum : req.body.orderNum,
-                username : req.user.usernamenpm
+                username : req.user.username,
+                message : req.body.message
                 });
             recommendation.save(function (err, recommendation) {
                 if (!recommendation) {
+                    res.statusCode = 404;
                     return res.send(err.message)
                 }
                 if (!err) {
+                    res.statusCode = 200;
                     return res.send({recommendation: recommendation})
                 } else {
+                    res.statusCode = 500;
                     return res.send(err.name)
                 }
             })
