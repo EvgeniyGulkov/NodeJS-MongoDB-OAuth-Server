@@ -22,13 +22,17 @@
     });
 
  //////////////// carOrder scheme /////////////////////////////////
+ const OrderSection = new Scheme({
+     date: {type: Date, required: true,unique: true, default: Date.now()},
+     orders: {type: [ObjectId]}
+ });
 
  const CarOrder = new Scheme({
      companyName: {type: String,required: true},
      manufacturer: {type: String, required: true},
      model: {type: String, required: true},
      plate: {type: String, required: true},
-     date: {type: Date, required:true, default: Date.now()},
+     time: {type: Date, required:true, default: Date.now()},
      vinNumber: {type: String, required: true},
      status: {type: String, required: true},
      orderNum: {type: Number, required:true}
@@ -119,7 +123,7 @@
  });
 
 /////////////////////////// Exports /////////////////////
-
+    module.exports.OrderSection = mongoose.model('OrderSection', OrderSection);
     module.exports.ReasonModel = mongoose.model('Reason',Reason);
     module.exports.CompanyModel = mongoose.model('Company',Company);
     module.exports.CarOrderModel = mongoose.model('CarOrder',CarOrder);

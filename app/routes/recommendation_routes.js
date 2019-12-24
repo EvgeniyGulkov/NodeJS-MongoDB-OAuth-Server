@@ -3,9 +3,11 @@ module.exports = function (app) {
     const RecommendationModel = require('../libs/mongoose').RecommendationModel;
     const passport = require('passport');
 
-    app.get('/api/recommendation/', passport.authenticate('bearer', { session: false }),
+    app.get('/api/recommendations/:num', passport.authenticate('bearer', { session: false }),
         function(req, res) {
-            return RecommendationModel.find({companyName: req.user.companyName,orderNum: req.body.orderNum}, function (err, recommendation) {
+            var orderNum = req.params.num;
+            console.log(orderNum);
+            return RecommendationModel.find({companyName: req.user.companyName,orderNum: orderNum}, function (err, recommendation) {
                 if (!recommendation) {
                     res.statusCode = 404;
                     return res.send({error: 'Not found'});
