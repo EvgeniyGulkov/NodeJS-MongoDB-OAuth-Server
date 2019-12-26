@@ -3,8 +3,9 @@ module.exports = function (app) {
     const CarOrderModel = require('../libs/mongoose').CarOrderModel;
     const ReasonModel = require('../libs/mongoose').ReasonModel;
     const passport = require('passport');
+    require('querystring');
 
-    app.get('/api/carorders/', passport.authenticate('bearer', {session: false}),
+    app.get('/api/carorders/:limit/:offset', passport.authenticate('bearer', {session: false}),
         function (req, res) {
             return CarOrderModel.find({companyName: req.user.companyName},{_id:0, companyName:0, reason: 0, __v:0}, function (err, carOrder) {
                 if (!carOrder) {
@@ -13,14 +14,13 @@ module.exports = function (app) {
                 }
                 if (!err) {
                     console.log("Order request ok");
-                    console.log(carOrder);
                     return res.json(carOrder);
                 } else {
                     res.statusCode = 500;
                     console.log('Internal error: ' + res.statusCode, err.message);
                     return res.send({error: 'Server error'});
                 }
-            });
+            }).limit(Number(req.params.limit)).skip(Number(req.params.offset));
         });
 
     app.post('/api/carOrders/', passport.authenticate('bearer', {session: false}),
@@ -61,6 +61,7 @@ module.exports = function (app) {
         let reasonRow = reasonsString.split(",");
 
         reasonRow.forEach(function (entry) {
+            entry = entry.charAt(0).toUpperCase() + entry.substr(1).toLowerCase();
             return ReasonModel.findOne({
                 orderNum: req.body.orderNum,
                 companyName: req.user.companyName,
