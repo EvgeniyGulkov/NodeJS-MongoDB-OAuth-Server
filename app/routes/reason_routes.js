@@ -19,7 +19,6 @@ module.exports = function (app) {
                 if (!err) {
                     console.log("Reasons send");
                     res.statusCode = 200;
-                    console.log(JSON.stringify(reason));
                     return res.send(JSON.stringify(reason));
                 } else {
                     res.statusCode = 500;

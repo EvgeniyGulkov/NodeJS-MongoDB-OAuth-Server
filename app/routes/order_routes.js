@@ -56,7 +56,9 @@ module.exports = function (app) {
         });
 
     function addReasons(req, res) {
-        let reasonRow = (req.body.reason).split(",");
+        let reasonsString = req.body.reason.replace(", ",',');
+        reasonsString = reasonsString.toLowerCase();
+        let reasonRow = reasonsString.split(",");
 
         reasonRow.forEach(function (entry) {
             return ReasonModel.findOne({

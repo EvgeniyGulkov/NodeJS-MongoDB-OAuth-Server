@@ -7,14 +7,14 @@ module.exports = function (app) {
         function(req, res) {
             var orderNum = req.params.num;
             console.log(orderNum);
-            return RecommendationModel.find({companyName: req.user.companyName,orderNum: orderNum}, function (err, recommendation) {
+            return RecommendationModel.find({companyName: req.user.companyName,orderNum: orderNum},{_id:0, __v:0, companyName:0, orderNum:0}, function (err, recommendation) {
                 if (!recommendation) {
                     res.statusCode = 404;
                     return res.send({error: 'Not found'});
                 }
                 if (!err) {
                     console.log("Recommendation send");
-                    return res.send({recommendation: recommendation});
+                    return res.json(recommendation);
                 } else {
                     res.statusCode = 500;
                     console.log('Internal error: ' +  res.statusCode, err.message);
