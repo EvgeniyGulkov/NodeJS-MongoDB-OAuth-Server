@@ -27,22 +27,16 @@ passport.use(new BasicStrategy(
 
 passport.use(new ClientPasswordStrategy(
     function(clientId, clientSecret, done) {
-        console.log(clientId);
-        console.log(clientSecret);
         ClientModel.findOne({ clientId: clientId }, function(err, client) {
             if (err) {
-                console.log(err);
                 return done(err);
             }
             if (!client) {
-                console.log("ClientPassword strategy. User not found!");
                 return done(null, false);
             }
             if (client.clientSecret !== clientSecret) {
-                console.log("Secret incorrect");
                 return done(null, false);
             }
-            console.log("ClientID " + client.clientId);
             return done(null, client);
         });
     }
@@ -61,7 +55,6 @@ passport.use(new BearerStrategy(
             }
 
             const tokenTime = Math.round((Date.now() - token.created) / 1000);
-            console.log(tokenTime);
             if (tokenTime > config.get('security:tokenLife')) {
                 AccessTokenModel.remove({token: accessToken}, function (err) {
                     if (err) {
@@ -69,7 +62,6 @@ passport.use(new BearerStrategy(
                         return done(err);
                     }
                 });
-                console.log('Token expired');
                 return done(null, false, {message: 'Token expired'});
             }
 

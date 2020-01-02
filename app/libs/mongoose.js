@@ -107,6 +107,7 @@
      orderNum: {type: Number, required: true},
      username: {type: String, required: true},
      companyName: {type:String, required: true},
+     isMy: {type: Boolean, required: true, default: false},
      message: {type:String, required: true},
      created: {type:Date, default:Date.now()}
  });

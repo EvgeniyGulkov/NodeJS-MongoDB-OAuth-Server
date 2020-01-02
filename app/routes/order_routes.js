@@ -5,9 +5,19 @@ module.exports = function (app) {
     const passport = require('passport');
     require('querystring');
 
-    app.get('/api/carorders/:limit/:offset', passport.authenticate('bearer', {session: false}),
+    app.get('/api/carorders/', passport.authenticate('bearer', {session: false}),
         function (req, res) {
-            return CarOrderModel.find({companyName: req.user.companyName},{_id:0, companyName:0, reason: 0, __v:0}, function (err, carOrder) {
+        const limit = Number(req.query.limit);
+        const offset = Number(req.query.offset);
+
+            return CarOrderModel.find({companyName: req.user.companyName, $or: [
+                { plate: {$regex:req.query.searchtext.toLowerCase()}},
+                { vinNumber: {$regex: req.query.searchtext.toLowerCase()}}
+                ]},
+                {_id:0, companyName:0, reason: 0, __v:0})
+                .skip(offset)
+                .limit(limit)
+                .exec( function (err, carOrder) {
                 if (!carOrder) {
                     res.statusCode = 404;
                     return res.send({error: 'Not found'});
@@ -20,7 +30,7 @@ module.exports = function (app) {
                     console.log('Internal error: ' + res.statusCode, err.message);
                     return res.send({error: 'Server error'});
                 }
-            }).limit(Number(req.params.limit)).skip(Number(req.params.offset));
+            });
         });
 
     app.post('/api/carOrders/', passport.authenticate('bearer', {session: false}),

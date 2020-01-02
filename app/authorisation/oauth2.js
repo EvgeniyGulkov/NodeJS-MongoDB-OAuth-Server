@@ -17,8 +17,6 @@ var errFn = function (cb, err) {
 
 // Destroy any old tokens and generates a new access and refresh token
 var generateTokens = function (data, done) {
-
-    console.log()
     // Curries in `done` callback so we don't need to pass it
     var errorHandler = errFn.bind(undefined, done),
         refreshToken,
@@ -61,7 +59,6 @@ aserver.exchange(oauth2orize.exchange.password(function (client, username, passw
         }
 
         if (!user || !user.checkPassword(password)) {
-            console.log("User or password incorrect");
             return done(null, false);
         }
         console.log("exchange user and password for userId" + user.userId);

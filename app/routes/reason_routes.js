@@ -3,10 +3,9 @@ module.exports = function (app) {
     const ReasonModel = require('../libs/mongoose').ReasonModel;
     const passport = require('passport');
 
-    app.get('/api/reasons/:num', passport.authenticate('bearer', {session: false}),
+    app.get('/api/reasons/', passport.authenticate('bearer', {session: false}),
         function (req, res) {
-        console.log(req.params.num);
-        var orderNum = req.params.num;
+        var orderNum = req.query.ordernumber;
             return ReasonModel.find({
                 companyName: req.user.companyName,
                 orderNum: orderNum
