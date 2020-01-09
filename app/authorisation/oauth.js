@@ -56,7 +56,7 @@ passport.use(new BearerStrategy(
 
             const tokenTime = Math.round((Date.now() - token.created) / 1000);
             if (tokenTime > config.get('security:tokenLife')) {
-                AccessTokenModel.remove({token: accessToken}, function (err) {
+                AccessTokenModel.deleteOne({token: accessToken}, function (err) {
                     if (err) {
                         console.log(err);
                         return done(err);

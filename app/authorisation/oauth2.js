@@ -1,7 +1,6 @@
 const oauth2orize         = require('oauth2orize');
 const passport            = require('passport');
 const crypto              = require('crypto');
-const config              = require('../libs/config');
 const User           = require('../libs/mongoose').UserModel;
 const AccessToken    = require('../libs/mongoose').AccessTokenModel;
 const RefreshToken   = require('../libs/mongoose').RefreshTokenModel;
@@ -16,7 +15,7 @@ var errFn = function (cb, err) {
 };
 
 // Destroy any old tokens and generates a new access and refresh token
-var generateTokens = function (data, done) {
+var generateTokens = function (data, done, user) {
     // Curries in `done` callback so we don't need to pass it
     var errorHandler = errFn.bind(undefined, done),
         refreshToken,
@@ -24,8 +23,8 @@ var generateTokens = function (data, done) {
         token,
         tokenValue;
 
-    RefreshToken.remove(data, errorHandler);
-    AccessToken.remove(data, errorHandler);
+    RefreshToken.deleteOne(data, errorHandler);
+    AccessToken.deleteOne(data, errorHandler);
 
     tokenValue = crypto.randomBytes(32).toString('hex');
     refreshTokenValue = crypto.randomBytes(32).toString('hex');
@@ -44,7 +43,7 @@ var generateTokens = function (data, done) {
             return done(err);
         }
         done(null, tokenValue, refreshTokenValue, {
-            'expires_in': config.get('security:tokenLife')
+            'username' : user.username
         });
     });
 };
@@ -67,7 +66,7 @@ aserver.exchange(oauth2orize.exchange.password(function (client, username, passw
             clientId: client.clientId
         };
 
-        generateTokens(model, done);
+        generateTokens(model, done, user);
     });
 
 }));
@@ -101,7 +100,7 @@ aserver.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToke
                 clientId: client.clientId
             };
 
-            generateTokens(model, done);
+            generateTokens(model, done, user);
         });
     });
 }));

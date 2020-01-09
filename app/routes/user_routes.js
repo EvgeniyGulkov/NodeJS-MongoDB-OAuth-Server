@@ -53,30 +53,30 @@ module.exports = function (app) {
         });
     }
 
-        function addAdmin(req, res) {
-            if (req.user.username === config.get('default:user:username')) {
-                UserModel.findOne({username: req.body.username}, function (err, user) {
-                    if (user) {
-                        console.log("Set " + user.username + " as admin");
-                        const admin = new AdminModel({
-                            userName: user.username
-                        });
-                        admin.save(function (err, admin) {
-                            if (!admin) {
-                                return res.send(err.message)
-                            }
-                            if (!err) {
-                                return res.send("new admin " + admin.userName)
-                            } else {
-                                return res.send(err.name)
-                            }
-                        })
-                    } else {
-                        res.send("User not found")
-                    }
-                });
-            } else {
-                res.send({error: "Access denied"});
-            }
+    function addAdmin(req, res) {
+        if (req.user.username === config.get('default:user:username')) {
+            UserModel.findOne({username: req.body.username}, function (err, user) {
+                if (user) {
+                    console.log("Set " + user.username + " as admin");
+                    const admin = new AdminModel({
+                        userName: user.username
+                    });
+                    admin.save(function (err, admin) {
+                        if (!admin) {
+                            return res.send(err.message)
+                        }
+                        if (!err) {
+                            return res.send("new admin " + admin.userName)
+                        } else {
+                            return res.send(err.name)
+                        }
+                    })
+                } else {
+                    res.send("User not found")
+                }
+            });
+        } else {
+            res.send({error: "Access denied"});
         }
+    }
 };

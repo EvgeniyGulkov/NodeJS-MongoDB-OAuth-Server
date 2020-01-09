@@ -5,7 +5,7 @@ module.exports = function (app) {
 
     app.get('/api/reasons/', passport.authenticate('bearer', {session: false}),
         function (req, res) {
-        var orderNum = req.query.ordernumber;
+            var orderNum = req.query.ordernumber;
             return ReasonModel.find({
                 companyName: req.user.companyName,
                 orderNum: orderNum
@@ -29,7 +29,7 @@ module.exports = function (app) {
 
     app.post('/api/reasons/changestatus', passport.authenticate('bearer', {session: false}),
         function (req, res) {
-        console.log(req.body.id);
+            console.log(req.body.id);
             return ReasonModel.findOne({
                 _id: req.body.id
             }, function (err, reason) {
@@ -44,7 +44,7 @@ module.exports = function (app) {
                         if (!err) {
                             console.log("Reason status changed");
                             res.statusCode = 200;
-                            return res.send({reason: reason})
+                            return res.json(res.statusCode)
                         } else {
                             console.log(err.name);
                             return res.send(err.name)

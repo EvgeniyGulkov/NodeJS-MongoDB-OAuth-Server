@@ -7,30 +7,30 @@ module.exports = function (app) {
 
     app.get('/api/carorders/', passport.authenticate('bearer', {session: false}),
         function (req, res) {
-        const limit = Number(req.query.limit);
-        const offset = Number(req.query.offset);
+            const limit = Number(req.query.limit);
+            const offset = Number(req.query.offset);
 
             return CarOrderModel.find({companyName: req.user.companyName, $or: [
-                { plate: {$regex:req.query.searchtext.toLowerCase()}},
-                { vinNumber: {$regex: req.query.searchtext.toLowerCase()}}
-                ]},
+                        { plate: {$regex:req.query.searchtext.toLowerCase()}},
+                        { vinNumber: {$regex: req.query.searchtext.toLowerCase()}}
+                    ]},
                 {_id:0, companyName:0, reason: 0, __v:0})
                 .skip(offset)
                 .limit(limit)
                 .exec( function (err, carOrder) {
-                if (!carOrder) {
-                    res.statusCode = 404;
-                    return res.send({error: 'Not found'});
-                }
-                if (!err) {
-                    console.log("Order request ok");
-                    return res.json(carOrder);
-                } else {
-                    res.statusCode = 500;
-                    console.log('Internal error: ' + res.statusCode, err.message);
-                    return res.send({error: 'Server error'});
-                }
-            });
+                    if (!carOrder) {
+                        res.statusCode = 404;
+                        return res.send({error: 'Not found'});
+                    }
+                    if (!err) {
+                        console.log("Order request ok");
+                        return res.json(carOrder);
+                    } else {
+                        res.statusCode = 500;
+                        console.log('Internal error: ' + res.statusCode, err.message);
+                        return res.send({error: 'Server error'});
+                    }
+                });
         });
 
     app.post('/api/carOrders/', passport.authenticate('bearer', {session: false}),
@@ -45,9 +45,9 @@ module.exports = function (app) {
                 carOrder.companyName = req.user.companyName;
                 carOrder.manufacturer = req.body.manufacturer;
                 carOrder.model = req.body.model;
-                carOrder.plate = req.body.plate;
+                carOrder.plate = req.body.plate.toLowerCase();
                 carOrder.date = new Date;
-                carOrder.vinNumber = req.body.vinNumber;
+                carOrder.vinNumber = req.body.vinNumber.toLowerCase();
                 carOrder.status = req.body.status;
                 carOrder.orderNum = req.body.orderNum;
                 carOrder.save(function (err, carOrder) {

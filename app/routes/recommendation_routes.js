@@ -15,8 +15,8 @@ module.exports = function (app) {
                     res.statusCode = 200;
                     recommendation.map(message => {
                         if (message.username === req.user.username) {
-                        message.isMy = true}}
-                        );
+                            message.isMy = true}}
+                    );
                     return res.json(recommendation);
                 } else {
                     res.statusCode = 500;
@@ -27,12 +27,12 @@ module.exports = function (app) {
 
     app.post('/api/recommendations/add',passport.authenticate('bearer', { session: false }),
         function(req, res) {
-                const recommendation = new RecommendationModel ({
+            const recommendation = new RecommendationModel ({
                 companyName: req.user.companyName,
                 orderNum : req.body.orderNum,
                 username : req.user.username,
                 message : req.body.message
-                });
+            });
             recommendation.save(function (err, recommendation) {
                 if (!recommendation) {
                     res.statusCode = 404;
@@ -40,12 +40,12 @@ module.exports = function (app) {
                 }
                 if (!err) {
                     res.statusCode = 200;
-                    return res.sendStatus(res.statusCode)
+                    return res.json(res.statusCode)
                 } else {
                     res.statusCode = 500;
                     return res.send(err.name)
                 }
             })
-            });
+        });
 
 };
