@@ -42,39 +42,42 @@ passport.use(new ClientPasswordStrategy(
     }
 ));
 
-passport.use(new BearerStrategy(
-    function(accessToken, done) {
-        AccessTokenModel.findOne({token: accessToken}, function (err, token) {
-            if (err) {
-                console.log(err);
-                return done(err);
-            }
-            if (!token) {
-                console.log("Token not found");
-                return done(null, false);
-            }
+const checkStrategy = function accessTokenStrategy(accessToken, done) {
+    AccessTokenModel.findOne({token: accessToken}, function (err, token) {
+        if (err) {
+            console.log(err);
+            return done(err);
+        }
+        if (!token) {
+            console.log("Token not found");
+            return done(null, false);
+        }
 
-            const tokenTime = Math.round((Date.now() - token.created) / 1000);
-            if (tokenTime > config.get('security:tokenLife')) {
-                AccessTokenModel.deleteOne({token: accessToken}, function (err) {
-                    if (err) {
-                        console.log(err);
-                        return done(err);
-                    }
-                });
-                return done(null, false, {message: 'Token expired'});
-            }
-
-            UserModel.findById(token.userId, function (err, user) {
+        const tokenTime = Math.round((Date.now() - token.created) / 1000);
+        if (tokenTime > config.get('security:tokenLife')) {
+            AccessTokenModel.deleteOne({token: accessToken}, function (err) {
                 if (err) {
+                    console.log(err);
                     return done(err);
                 }
-                if (!user) {
-                    return done(null, false, {message: 'Unknown user'});
-                }
-
-                var info = {scope: '*'};
-                done(null, user, info);
             });
+            return done(null, false, {message: 'Token expired'});
+        }
+
+        UserModel.findById(token.userId, function (err, user) {
+            if (err) {
+                return done(err);
+            }
+            if (!user) {
+                return done(null, false, {message: 'Unknown user'});
+            }
+
+            var info = {scope: '*'};
+            done(null, user, info);
         });
-    }));
+    });
+};
+
+passport.use(new BearerStrategy(checkStrategy));
+
+module.exports.checkStrategy = checkStrategy;

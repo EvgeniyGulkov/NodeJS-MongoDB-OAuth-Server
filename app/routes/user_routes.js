@@ -8,6 +8,7 @@ module.exports = function (app) {
 
     require('../authorisation/oauth');
 
+
     app.post('/oauth/token', oauth2.token);
 
     app.get('/api/userinfo', passport.authenticate('bearer', {session: false}),

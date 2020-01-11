@@ -9,10 +9,10 @@ module.exports = function (app) {
         function (req, res) {
             const limit = Number(req.query.limit);
             const offset = Number(req.query.offset);
-
+            const searchText = String(req.query.searchtext);
             return CarOrderModel.find({companyName: req.user.companyName, $or: [
-                        { plate: {$regex:req.query.searchtext.toLowerCase()}},
-                        { vinNumber: {$regex: req.query.searchtext.toLowerCase()}}
+                        { plate: {$regex:searchText.toLowerCase()}},
+                        { vinNumber: {$regex: searchText.toLowerCase()}}
                     ]},
                 {_id:0, companyName:0, reason: 0, __v:0})
                 .skip(offset)
@@ -45,9 +45,9 @@ module.exports = function (app) {
                 carOrder.companyName = req.user.companyName;
                 carOrder.manufacturer = req.body.manufacturer;
                 carOrder.model = req.body.model;
-                carOrder.plate = req.body.plate.toLowerCase();
+                carOrder.plate = String(req.body.plate).toLowerCase();
                 carOrder.date = new Date;
-                carOrder.vinNumber = req.body.vinNumber.toLowerCase();
+                carOrder.vinNumber = String(req.body.vinNumber).toLowerCase();
                 carOrder.status = req.body.status;
                 carOrder.orderNum = req.body.orderNum;
                 carOrder.save(function (err, carOrder) {
