@@ -26,8 +26,6 @@ app.use(function (err,req,res) {
     res.send({error: err.message});
 });
 
-
-
 server.listen(config,function () {
     console.log("listen on port " + config.port)
 });
