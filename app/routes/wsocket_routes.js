@@ -21,18 +21,29 @@ module.exports = function (server) {
     });
 
     io.on('connection', function (socket) {
-        const user = socket.user.username;
-        console.log('User ' + user + ' connected on websocket');
+        socket.leaveAll();
+        const user = socket.user;
+        const room = String(user.companyName);
+        console.log('User ' + user.username + ' connected on websocket');
+        socket.join(room);
+        console.log('user joined to room - ' + room);
 
         socket.emit('connection', String('Hello '+ user));
 
+        socket.on('join',function () {
+            console.log('user joined')
+        });
+
         socket.on('disconnect', function () {
-            console.log('User '+ user +' disconnected');
+            console.log('User '+ user.username +' disconnected');
         });
+
+
         socket.on('add message', function (data) {
-            console.log(user + ': '+ data.orderNum + ', ' + data.message);
-            addMessage(data, socket)
+            addMessage(data, socket);
         });
+
+
     });
 
     function addMessage (data, socket) {
@@ -47,7 +58,7 @@ module.exports = function (server) {
                 socket.emit('message response', 404)
             }
             if (!err) {
-                console.log('New message added');
+                socket.to(socket.user.companyName).emit('get message', recommendation);
                 socket.emit('message response', 200)
             } else {
                 socket.emit('message response', 500)
