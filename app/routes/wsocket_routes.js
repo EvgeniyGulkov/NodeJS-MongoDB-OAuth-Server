@@ -29,7 +29,7 @@ module.exports = function (server) {
         socket.join(room);
         console.log('user joined to room - ' + room);
 
-        socket.emit('connection', String('Hello '+ user));
+        socket.emit('connection', String('Hello '+ user.username));
 
         socket.on('join',function () {
             console.log('user joined')
@@ -38,7 +38,6 @@ module.exports = function (server) {
         socket.on('disconnect', function () {
             console.log('User '+ user.username +' disconnected');
         });
-
 
         socket.on('add message', function (data) {
             addMessage(data, socket);
@@ -66,17 +65,10 @@ module.exports = function (server) {
                 socket.emit('message response', 404)
             }
             if (!err) {
-                CarOrderModel.find({companyName: socket.user.companyName, orderNum: data.orderNum}).exec( function(err,order){
-                    const newOrder = order;
-                    if(err){
-                        console.log(err)
-                    } else
-                    if(newOrder) {
-                        console.log(order);
-                        newOrder.updateDate = Date.now();
-                        console.log(order);
-                    }
-                });
+                CarOrderModel.findOneAndUpdate({companyName: socket.user.companyName, orderNum: data.orderNum},
+                    {updateDate: Date.now()},{new: true},function (err, order) {
+                        console.log(order)
+                    });
                 socket.to(socket.user.companyName).emit('get message',
                     {
                         created: recommendation.created,

@@ -24,12 +24,55 @@ module.exports = function (app) {
         addUser(req, res)
     });
 
+    app.post('/api/user/changechatname', passport.authenticate('bearer', {session: false}), function (req, res) {
+        UserModel.findOneAndUpdate({username: req.user.username},
+            {chatName: req.body.chatname},{new: true},function (err, user) {
+                if (!user) {
+                    res.statusCode = 404;
+                    return res.send('user not found')
+                }
+                if (!err) {
+                    console.log('user '+ req.user.username + ' changed chatname to ' + user.chatName);
+                    res.statusCode = 200;
+                    return res.send(user.chatName)
+                }
+                else {
+                    res.statusCode = 500;
+                    return res.send(err)
+                }
+            });
+    });
+
+    app.post('/api/user/changepassword', passport.authenticate('bearer', {session: false}), function (req, res) {
+        UserModel.findOne({username: req.user.username}, function (err, user) {
+                if(!user) {
+                    res.statusCode = 400;
+                    return res.send('User not found')
+                }
+                if (!err) {
+                    if(user.checkPassword(req.body.currentpassword)) {
+                        user.password = req.body.newpassword;
+                        user.save(function (err) {
+                            if (!err) {
+                                console.log('user ' + user.username + ' change password');
+                                return res.send(200)
+                            } else {
+                                return res.send (400)
+                            }
+                        })
+                    } else {
+                        res.statusCode = 400;
+                        return res.send('Entered current password is incorrect');
+                    }
+                }
+            })
+    });
+
     function addUser(req, res) {
         AdminModel.findOne({userName: req.user.username}, function (err, admin) {
             if (admin) {
                 const user = new UserModel({
-                    firstName: req.body.firstName,
-                    lastName: req.body.lastName,
+                    chatName: req.body.username,
                     username: req.body.username,
                     password: req.body.password,
                     companyName: req.user.companyName

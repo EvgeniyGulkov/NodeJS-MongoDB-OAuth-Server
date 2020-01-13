@@ -9,7 +9,6 @@ const config = require('../libs/config');
 
 passport.use(new BasicStrategy(
     function (username, password, done) {
-        console.log(username + password);
         ClientModel.findOne({ clientId: username }, function (err, client) {
             if (err) {
                 return done(err);

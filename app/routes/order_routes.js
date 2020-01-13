@@ -10,8 +10,8 @@ module.exports = function (app) {
             const offset = Number(req.query.offset);
             const searchText = String(req.query.searchtext);
             return CarOrderModel.find({companyName: req.user.companyName, $or: [
-                        { plate: {$regex:searchText.toLowerCase()}},
-                        { vinNumber: {$regex: searchText.toLowerCase()}}
+                        { plate: {$regex:searchText.toUpperCase()}},
+                        { vinNumber: {$regex: searchText.toUpperCase()}}
                     ]},
                 {_id:0, companyName:0, reason: 0, __v:0})
                 .skip(offset)
@@ -32,7 +32,7 @@ module.exports = function (app) {
                 });
         });
 
-    app.post('/api/carOrders/', passport.authenticate('bearer', {session: false}),
+    app.post('/api/carorders/', passport.authenticate('bearer', {session: false}),
         function (req, res) {
             return CarOrderModel.findOne({
                 orderNum: req.body.orderNum,
@@ -40,14 +40,14 @@ module.exports = function (app) {
             }, function (err, carOrder) {
                 if (!carOrder) {
                     carOrder = new CarOrderModel;
+                    carOrder.createDate = Date.now();
                 }
                 carOrder.companyName = req.user.companyName;
                 carOrder.manufacturer = req.body.manufacturer;
                 carOrder.model = req.body.model;
-                carOrder.createDate = Date.now();
                 carOrder.updateDate = Date.now();
                 carOrder.plate = String(req.body.plate).toUpperCase();
-                carOrder.vinNumber = String(req.body.vinNumber).toLowerCase();
+                carOrder.vinNumber = String(req.body.vinNumber).toUpperCase();
                 carOrder.status = req.body.status;
                 carOrder.orderNum = req.body.orderNum;
                 carOrder.save(function (err, carOrder) {
@@ -55,18 +55,18 @@ module.exports = function (app) {
                         return res.send(err.message)
                     }
                     if (!err) {
+                        addReasons(req);
                         console.log("New order added or updated");
                         return res.send({result: "order added"})
                     } else {
                         return res.send(err.name)
                     }
                 });
-                addReasons(req, res)
             });
         });
 
-    function addReasons(req, res) {
-        let reasonsString = req.body.reason.replace(", ",',');
+    function addReasons(req) {
+        let reasonsString = req.body.reason.replace(', ',',');
         reasonsString = reasonsString.toLowerCase();
         let reasonRow = reasonsString.split(",");
 
@@ -85,13 +85,12 @@ module.exports = function (app) {
                     reason.reasonText = entry;
                     reason.save(function (err, reason) {
                         if (!reason) {
-                            return res.send(err.message)
+                            console.log('reason not saved')
                         }
                         if (!err) {
                             console.log("New order added or updated");
-                            //return res.send("new reason added")
                         } else {
-                            return res.send(err.name)
+                            console.log(err)
                         }
                     });
                 }

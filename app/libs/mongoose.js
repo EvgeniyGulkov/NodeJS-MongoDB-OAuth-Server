@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const config = require('./config');
 const crypto = require('crypto');
 
-mongoose.connect(config.get('mongoose:uri'), {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
+mongoose.connect(config.get('mongoose:uri'), {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false});
 
 const db = mongoose.connection;
 db.on('error', function (err) {
@@ -37,8 +37,7 @@ const CarOrder = new Scheme({
 ///////////////// User scheme /////////////////
 
 const User = new Scheme({
-    firstName: {type: String, required: false},
-    lastName: {type: String, required: false},
+    chatName: {type: String, required: false},
     username: { type: String, require: true,unique: true},
     hashedPassword: {type: String, required: true, },
     salt: {type:String, required: true},
