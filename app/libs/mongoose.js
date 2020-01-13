@@ -27,7 +27,8 @@ const CarOrder = new Scheme({
     manufacturer: {type: String, required: true},
     model: {type: String, required: true},
     plate: {type: String, required: true},
-    date: {type: Date, required:true, default: Date.now()},
+    createDate: {type: Date, required:true},
+    updateDate: {type: Date, required: true},
     vinNumber: {type: String, required: true},
     status: {type: String, required: true},
     orderNum: {type: Number, required:true}

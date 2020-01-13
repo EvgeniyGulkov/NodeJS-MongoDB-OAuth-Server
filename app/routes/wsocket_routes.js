@@ -1,6 +1,7 @@
 module.exports = function (server) {
     const checkStrategy = require('../authorisation/oauth').checkStrategy;
     const RecommendationModel = require('../libs/mongoose').RecommendationModel;
+    const CarOrderModel = require('../libs/mongoose').CarOrderModel;
 
     const io = require('socket.io')(server);
 
@@ -43,6 +44,13 @@ module.exports = function (server) {
             addMessage(data, socket);
         });
 
+        socket.on('get messages', function(data) {
+            const limit = Number(data.limit);
+            const offset = Number(data.offset);
+            const orderNum = Number(data.orderNum);
+            getMessages(socket, limit, offset, orderNum)
+        })
+
 
     });
 
@@ -58,11 +66,46 @@ module.exports = function (server) {
                 socket.emit('message response', 404)
             }
             if (!err) {
-                socket.to(socket.user.companyName).emit('get message', recommendation);
+                CarOrderModel.find({companyName: socket.user.companyName, orderNum: data.orderNum}).exec( function(err,order){
+                    const newOrder = order;
+                    if(err){
+                        console.log(err)
+                    } else
+                    if(newOrder) {
+                        console.log(order);
+                        newOrder.updateDate = Date.now();
+                        console.log(order);
+                    }
+                });
+                socket.to(socket.user.companyName).emit('get message',
+                    {
+                        created: recommendation.created,
+                        orderNum: recommendation.orderNum,
+                        username: recommendation.username,
+                        message: recommendation.message
+                });
                 socket.emit('message response', 200)
             } else {
                 socket.emit('message response', 500)
             }
         })
+    }
+
+    function getMessages(socket, limit, offset, orderNum) {
+        RecommendationModel.find({companyName: socket.user.companyName, orderNum: orderNum},{_id:0, __v:0, companyName:0, orderNum:0}).limit(limit).skip(offset).exec( function (err, recommendation) {
+            if (!recommendation) {
+                return socket.emit('get messages response', {error: 'Not found'});
+            }
+            if (!err) {
+                recommendation.map(message => {
+                    if (message.username === socket.user.username) {
+                        message.isMy = true}}
+                );
+                console.log(recommendation);
+                return socket.emit('get messages response', recommendation);
+            } else {
+                return socket.emit('get messages response', {error: 'Server error'});
+            }
+        });
     }
 };

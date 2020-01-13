@@ -3,7 +3,6 @@ module.exports = function (app) {
     const CarOrderModel = require('../libs/mongoose').CarOrderModel;
     const ReasonModel = require('../libs/mongoose').ReasonModel;
     const passport = require('passport');
-    require('querystring');
 
     app.get('/api/carorders/', passport.authenticate('bearer', {session: false}),
         function (req, res) {
@@ -45,8 +44,9 @@ module.exports = function (app) {
                 carOrder.companyName = req.user.companyName;
                 carOrder.manufacturer = req.body.manufacturer;
                 carOrder.model = req.body.model;
-                carOrder.plate = String(req.body.plate).toLowerCase();
-                carOrder.date = new Date;
+                carOrder.createDate = Date.now();
+                carOrder.updateDate = Date.now();
+                carOrder.plate = String(req.body.plate).toUpperCase();
                 carOrder.vinNumber = String(req.body.vinNumber).toLowerCase();
                 carOrder.status = req.body.status;
                 carOrder.orderNum = req.body.orderNum;
