@@ -43,7 +43,7 @@ var generateTokens = function (data, done, user) {
             return done(err);
         }
         done(null, tokenValue, refreshTokenValue, {
-            'username' : user.username
+            'chatname' : user.chatName
         });
     });
 };

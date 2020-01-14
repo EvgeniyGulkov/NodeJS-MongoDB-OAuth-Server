@@ -6,6 +6,7 @@ module.exports = function (server) {
     const io = require('socket.io')(server);
 
     io.use(function (socket, next) {
+        console.log('socket try to connect');
         let token = socket.handshake.headers.authorization;
         checkStrategy(token,function (err, user) {
             if (!user) {
@@ -29,18 +30,13 @@ module.exports = function (server) {
         socket.join(room);
         console.log('user joined to room - ' + room);
 
-        socket.emit('connection', String('Hello '+ user.username));
-
-        socket.on('join',function () {
-            console.log('user joined')
-        });
-
         socket.on('disconnect', function () {
             console.log('User '+ user.username +' disconnected');
         });
 
-        socket.on('add message', function (data) {
-            addMessage(data, socket);
+        socket.on('add message', function (data, callback) {
+            console.log(data);
+            addMessage(data, socket,callback);
         });
 
         socket.on('get messages', function(data) {
@@ -53,7 +49,7 @@ module.exports = function (server) {
 
     });
 
-    function addMessage (data, socket) {
+    function addMessage (data, socket,callback) {
         const recommendation = new RecommendationModel ({
             companyName: socket.user.companyName,
             orderNum : data.orderNum,
@@ -62,12 +58,11 @@ module.exports = function (server) {
         });
         recommendation.save(function (err, recommendation) {
             if (!recommendation) {
-                socket.emit('message response', 404)
+                return callback(404)
             }
             if (!err) {
                 CarOrderModel.findOneAndUpdate({companyName: socket.user.companyName, orderNum: data.orderNum},
                     {updateDate: Date.now()},{new: true},function (err, order) {
-                        console.log(order)
                     });
                 socket.to(socket.user.companyName).emit('get message',
                     {
@@ -76,9 +71,9 @@ module.exports = function (server) {
                         username: recommendation.username,
                         message: recommendation.message
                 });
-                socket.emit('message response', 200)
+                callback(200)
             } else {
-                socket.emit('message response', 500)
+                callback(500)
             }
         })
     }
@@ -93,7 +88,6 @@ module.exports = function (server) {
                     if (message.username === socket.user.username) {
                         message.isMy = true}}
                 );
-                console.log(recommendation);
                 return socket.emit('get messages response', recommendation);
             } else {
                 return socket.emit('get messages response', {error: 'Server error'});
