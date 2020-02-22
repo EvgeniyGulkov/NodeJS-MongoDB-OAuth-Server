@@ -44,8 +44,12 @@ module.exports = function (server) {
             const offset = Number(data.offset);
             const orderNum = Number(data.orderNum);
             getMessages(socket, limit, offset, orderNum)
-        })
+        });
 
+        socket.on('delete message', function (data) {
+            const _id = Number(data._id);
+            deleteMessage(socket,_id)
+        })
 
     });
 
@@ -64,12 +68,13 @@ module.exports = function (server) {
                 CarOrderModel.findOneAndUpdate({companyName: socket.user.companyName, orderNum: data.orderNum},
                     {updateDate: Date.now()},{new: true},function (err, order) {
                     });
-                socket.to(socket.user.companyName).emit('get message',
+                socket.to(socket.user.companyName).emit('get new message',
                     {
                         created: recommendation.created,
-                        orderNum: recommendation.orderNum,
+                        isMy: recommendation.isMy,
                         username: recommendation.username,
-                        message: recommendation.message
+                        message: recommendation.message,
+                        _id: recommendation._id
                 });
                 callback(200)
             } else {
@@ -79,7 +84,7 @@ module.exports = function (server) {
     }
 
     function getMessages(socket, limit, offset, orderNum) {
-        RecommendationModel.find({companyName: socket.user.companyName, orderNum: orderNum},{_id:0, __v:0, companyName:0, orderNum:0}).limit(limit).skip(offset).exec( function (err, recommendation) {
+        RecommendationModel.find({companyName: socket.user.companyName, orderNum: orderNum},{__v:0, companyName:0, orderNum:0}).limit(limit).skip(offset).exec( function (err, recommendation) {
             if (!recommendation) {
                 return socket.emit('get messages response', {error: 'Not found'});
             }
@@ -93,5 +98,17 @@ module.exports = function (server) {
                 return socket.emit('get messages response', {error: 'Server error'});
             }
         });
+    }
+
+    function deleteMessage(socket, _id) {
+        RecommendationModel.findOneAndUpdate({username: socket.user.username, _id: _id},{message: 'This message was deleted'},{new: true},function (err,recommendation) {
+            if (!recommendation) {
+                return socket.emit('delete message response', {error: 'not found'});
+            }
+            if (!err) {
+                return socket.emit('delete message response', {recommendation})
+            } else {
+                return socket.emit('delete message response', {error: 'Server error'})            }
+        })
     }
 };
